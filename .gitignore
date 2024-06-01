@@ -1,0 +1,12 @@
+venv/
+*.env
+*.csv
+__pycache__
+*.pyc
+
+.vscode
+
+fda-import.py
+fda-to-csv.py
+*.sqlite3
+CreateFda.sql
