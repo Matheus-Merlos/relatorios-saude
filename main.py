@@ -29,10 +29,10 @@ if __name__ == '__main__':
         'host': os.getenv('HOST'),
         'database': os.getenv('DATABASE')
     }
-    # if None in credentials.values():
-    #     raise KeyError('Não foram encontradas as credenciais para conectar ao banco')
+    if None in credentials.values():
+        raise KeyError('Não foram encontradas as credenciais para conectar ao banco')
     
-    db.bind(provider='sqlite', filename='db.sqlite3')
+    db.bind(provider='postgres', **credentials)
     db.generate_mapping(create_tables=True)
     
     with open(latest_csv, 'r', encoding='utf-8') as file:

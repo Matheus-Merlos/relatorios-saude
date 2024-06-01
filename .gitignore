@@ -10,3 +10,5 @@ fda-import.py
 fda-to-csv.py
 *.sqlite3
 CreateFda.sql
+
+output/

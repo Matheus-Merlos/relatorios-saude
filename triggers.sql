@@ -16,6 +16,6 @@ $$ LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE TRIGGER update_unidade_trigger
-BEFORE INSERT ON ficha_de_atendimento
+BEFORE INSERT ON fichadeatendimento
 FOR EACH STATEMENT
 EXECUTE FUNCTION update_unidade();
