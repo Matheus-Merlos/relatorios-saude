@@ -4,6 +4,7 @@ from datetime import datetime
 from pathlib import Path
 from models import db
 import models
+import utils
 import csv
 import os
 
@@ -21,19 +22,7 @@ if __name__ == '__main__':
     files = [file for file in Path(__file__).parent.iterdir() if file.is_file() and str(file).endswith('.csv')]
     latest_csv = max(files, key=lambda file: file.stat().st_mtime)
     
-    load_dotenv()
-    
-    credentials = {
-        'user': os.getenv('USER'),
-        'password': os.getenv('PASSWORD'),
-        'host': os.getenv('HOST'),
-        'database': os.getenv('DATABASE')
-    }
-    if None in credentials.values():
-        raise KeyError('Não foram encontradas as credenciais para conectar ao banco')
-    
-    db.bind(provider='postgres', **credentials)
-    db.generate_mapping(create_tables=True)
+    utils.connect_to_database()
     
     with open(latest_csv, 'r', encoding='utf-8') as file:
         file_as_csv = csv.reader(file, delimiter=';')

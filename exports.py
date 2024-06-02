@@ -1,37 +1,34 @@
 from pony.orm import select, db_session
-from dotenv import load_dotenv
-from utils import save_to_file
-from typing import Callable
-from typing import Any
-from models import db
+from datetime import time, timedelta, date
 import models
-import os
+import utils
+import csv
 
-def save_to_csv(query: Any, file_name: str) -> None:
-    csv_as_str = ''
-    for line in query:
-        string = ','.join(str(element) for element in line)
-        string += '\n'
-        csv_as_str += string
-        
-    with open(f'output/{file_name}.csv', 'w', encoding='utf-8') as file:
-        file.write(csv_as_str)
-        
+@db_session
+def view_to_csv(view, csv_name: str) -> None:
+    with open(f'output/{csv_name}.csv', 'w', encoding='utf-8', newline='') as file:
+        query = select(ficha for ficha in view)[:]
     
+        writer = None
+        for element in query:
+            element_as_dict = element.to_dict()
+            del element_as_dict['id']
+            for k, v in element_as_dict.items():
+                if isinstance(v, (time, timedelta, date)):
+                    element_as_dict[k] = str(v)
+            
+            if writer is None:
+                writer = csv.DictWriter(file, fieldnames=element_as_dict.keys())
+                writer.writeheader()
+            
+            writer.writerow(element_as_dict)
+            
 
 if __name__ == '__main__':
-    load_dotenv()
-    
-    credentials = {
-        'user': os.getenv('USER'),
-        'password': os.getenv('PASSWORD'),
-        'host': os.getenv('HOST'),
-        'database': os.getenv('DATABASE')
-    }
-    if None in credentials.values():
-        raise KeyError('Não foram encontradas as credenciais para conectar ao banco')
-    
-    db.bind(provider='postgres', **credentials)
-    db.generate_mapping(create_tables=True)
+    utils.connect_to_database()
 
-    select((ficha.unidade, ficha.profissional, ficha.data_consulta) for ficha in models.FichaDeAtendimento if 'FISIOTERAPIA' in ficha.unidade)[:]
+    view_to_csv(models.FichasGeral, 'fichas-geral')
+    view_to_csv(models.FichasUnidades, 'fichas-medico')
+    view_to_csv(models.FichasCSCN, 'fichas-cscn')
+    view_to_csv(models.FichasFisioterapia, 'fichas-fisioterapia')
+    view_to_csv(models.FichasEnfermagem, 'fichas-enfermagem')
