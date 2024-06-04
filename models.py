@@ -3,6 +3,7 @@ from datetime import date, time, timedelta
 
 db = Database()
 
+
 class FichaDeAtendimento(db.Entity):
     id = PrimaryKey(str, max_len=15)
     unidadeid = Required(int)
@@ -16,7 +17,7 @@ class FichaDeAtendimento(db.Entity):
     horario = Required(time)
     hora_aten1 = Optional(time)
     hora_aten2 = Optional(time)
-    
+
 
 class FichasGeral(db.Entity):
     _table_ = 'fichasgeral'
@@ -28,7 +29,7 @@ class FichasGeral(db.Entity):
     sexo = Required(str)
     horario = Required(time)
     tempo_atendido = Optional(timedelta)
-    
+
 
 class FichasUnidades(db.Entity):
     _table_ = 'fichasunidades'
@@ -41,7 +42,7 @@ class FichasUnidades(db.Entity):
     horario = Required(time)
     tempo_atendido = Optional(timedelta)
     turno = Required(str)
-    
+
 
 class FichasCSCN(db.Entity):
     _table_ = 'fichascscn'
@@ -53,7 +54,7 @@ class FichasCSCN(db.Entity):
     horario = Required(time)
     tempo_atendido = Optional(timedelta)
     turno = Required(str)
-    
+
 
 class FichasFisioterapia(db.Entity):
     _table_ = 'fichasfisioterapia'
@@ -61,7 +62,7 @@ class FichasFisioterapia(db.Entity):
     unidade = Required(str)
     profissional = Optional(str)
     data_consulta = Required(date)
-    
+
 
 class FichasEnfermagem(db.Entity):
     _table_ = 'fichasenfermagem'
