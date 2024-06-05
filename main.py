@@ -1,5 +1,4 @@
 from dotenv import load_dotenv
-from datetime import datetime
 from pathlib import Path
 import psycopg2
 import csv
@@ -28,26 +27,21 @@ if __name__ == '__main__':
         cursor = connection.cursor()
 
         for row in file_as_csv:
-            try:
-                cursor.execute(f"""CALL insert_ficha(
-                                {row[0]},
-                                '{row[1]}',
-                                '{row[2]}',
-                                '{row[3]}',
-                                '{row[4]}',
-                                '{row[5]}',
-                                {row[6]},
-                                '{row[7]}',
-                                '{row[8][0]}',
-                                {row[9]},
-                                '{row[10]}',
-                                '{row[11]}',
-                                '{row[12]}');"""
-                               )
-            except (psycopg2.errors.UniqueViolation, psycopg2.errors.InFailedSqlTransaction):
-                print(f"""Ficha com o id {
-                      row[6]}/{row[9]} já existe no sistema, skippando""")
-                continue
+            cursor.execute(f"""CALL insert_ficha(
+                            {row[0]},
+                            '{row[1]}',
+                            '{row[2]}',
+                            '{row[3]}',
+                            '{row[4]}',
+                            '{row[5]}',
+                            {row[6]},
+                            '{row[7]}',
+                            '{row[8][0]}',
+                            {row[9]},
+                            '{row[10]}',
+                            '{row[11]}',
+                            '{row[12]}');"""
+                           )
 
         connection.commit()
 
