@@ -1,24 +1,9 @@
-from pony.orm import db_session, select, core, set_sql_debug
 from dotenv import load_dotenv
 from datetime import datetime
 from pathlib import Path
-from models import db
-import models
-import utils
+import psycopg2
 import csv
 import os
-
-
-def converter_data(data):
-    return datetime.strptime(data, "%d/%m/%Y").date()
-
-
-def converter_horario(horario):
-    return datetime.strptime(horario, "%H:%M:%S").time()
-
-
-def converter_time(time):
-    return datetime.strptime(time, "%d/%m/%Y %H:%M:%S").time()
 
 
 if __name__ == '__main__':
@@ -27,35 +12,45 @@ if __name__ == '__main__':
     ) if file.is_file() and str(file).endswith('.csv')]
     latest_csv = max(files, key=lambda file: file.stat().st_mtime)
 
-    utils.connect_to_database()
+    load_dotenv()
 
+    credentials = {
+        'user': os.getenv('USER'),
+        'password': os.getenv('PASSWORD'),
+        'host': os.getenv('HOST'),
+        'database': os.getenv('DATABASE')
+    }
     with open(latest_csv, 'r', encoding='utf-8') as file:
         file_as_csv = csv.reader(file, delimiter=';')
         [next(file_as_csv) for _ in range(3)]  # pula as 3 primeiras linhas
 
-        for row in file_as_csv:
-            ficha_de_atendimento = {
-                'id': f'{str(row[6])}/{str(row[9])}',
-                'unidadeid': row[0],
-                'unidade': row[1],
-                'profissional': row[2],
-                'especialidade': row[3],
-                'motivo_consulta': row[4],
-                'data_consulta': converter_data(row[5]),
-                'data_nascimento': converter_data(row[7]),
-                'sexo': row[8][0],
-                'horario': converter_horario(row[10]),
-                'hora_aten1': converter_time(row[11]) if row[11] else None,
-                'hora_aten2': converter_time(row[12]) if row[12] else None
-            }
+        connection = psycopg2.connect(**credentials)
+        cursor = connection.cursor()
 
+        for row in file_as_csv:
             try:
-                with db_session:
-                    models.FichaDeAtendimento(**ficha_de_atendimento)
-            except core.TransactionIntegrityError as e:
-                if 'UNIQUE constraint failed' in str(e):
-                    print(f'Ficha de atendimento {
-                          ficha_de_atendimento["id"]} já existe na base de dados, skippando')
+                cursor.execute(f"""CALL insert_ficha(
+                                {row[0]},
+                                '{row[1]}',
+                                '{row[2]}',
+                                '{row[3]}',
+                                '{row[4]}',
+                                '{row[5]}',
+                                {row[6]},
+                                '{row[7]}',
+                                '{row[8][0]}',
+                                {row[9]},
+                                '{row[10]}',
+                                '{row[11]}',
+                                '{row[12]}');"""
+                               )
+                connection.commit()
+            except (psycopg2.errors.UniqueViolation, psycopg2.errors.InFailedSqlTransaction):
+                print(f"""Ficha com o id {
+                      row[6]}/{row[9]} já existe no sistema, skippando""")
                 continue
+
+        cursor.close()
+        connection.close()
 
     print('Importação de dados concluída com sucesso!')
