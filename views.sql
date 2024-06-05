@@ -1,5 +1,3 @@
-DROP MATERIALIZED VIEW fichasgeral;
-
 CREATE MATERIALIZED VIEW IF NOT EXISTS fichasgeral
 AS 
 SELECT
@@ -14,7 +12,7 @@ SELECT
 FROM fichadeatendimento
 WHERE unidade NOT LIKE '%FISIOTERAPIA%';
 
-CREATE OR REPLACE MATERIALIZED VIEW fichasunidades
+CREATE MATERIALIZED VIEW fichasunidades
 AS SELECT
   id,
   unidade,
@@ -38,9 +36,7 @@ especialidade = 'MEDICO CLINICO GERAL' OR
 especialidade = 'MÉDICO CLÍNICO')
 AND (unidade LIKE 'ESF%' OR unidade LIKE 'UBS%' OR unidade LIKE '%CANGO');
 
-
-
-CREATE OR REPLACE MATERIALIZED VIEW fichascscn
+CREATE MATERIALIZED VIEW fichascscn
 AS SELECT
   id,
   unidade,
@@ -63,7 +59,7 @@ WHERE unidadeid = 427;
 
 
 
-CREATE OR REPLACE MATERIALIZED VIEW fichasfisioterapia
+CREATE MATERIALIZED VIEW fichasfisioterapia
 AS SELECT
   id,
   unidade, 
@@ -75,7 +71,7 @@ WHERE unidade LIKE '%FISIOTERAPIA%';
 
 
 
-CREATE OR REPLACE MATERIALIZED VIEW fichasenfermagem 
+CREATE MATERIALIZED VIEW fichasenfermagem 
 AS SELECT
   id,
   unidade,

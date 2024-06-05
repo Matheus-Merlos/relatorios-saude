@@ -68,6 +68,18 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
+CREATE OR REPLACE PROCEDURE refresh_views()
+AS $$
+BEGIN
+    REFRESH MATERIALIZED VIEW fichasgeral;
+    REFRESH MATERIALIZED VIEW fichasunidades;
+    REFRESH MATERIALIZED VIEW fichascscn;
+    REFRESH MATERIALIZED VIEW fichasfisioterapia;
+    REFRESH MATERIALIZED VIEW fichasenfermagem;
+END;
+$$ LANGUAGE plpgsql;
+
 SELECT COUNT(*) FROM fichadeatendimento;
 
 DELETE FROM fichadeatendimento;

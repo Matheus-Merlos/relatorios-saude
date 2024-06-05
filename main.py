@@ -50,6 +50,10 @@ if __name__ == '__main__':
                 continue
 
         connection.commit()
+
+        cursor.execute("CALL refresh_views()")
+
+        connection.commit()
         cursor.close()
         connection.close()
 
