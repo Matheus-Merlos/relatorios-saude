@@ -31,11 +31,16 @@ CREATE OR REPLACE PROCEDURE insert_ficha(
 )
 AS $$
 DECLARE
-    id VARCHAR;
+    id_in VARCHAR;
     tempo_atendido INTEGER;
     hora_in TIME;
     hora_out TIME;
 BEGIN
+    id_in := usuario_in || '/' || codigo_consulta_in;
+    IF EXISTS (SELECT 1 FROM fichadeatendimento AS f WHERE f.id = id_in) THEN
+        RETURN;
+    END IF;
+
     --Caso não sejam especificados os horários de entrada ou saida, ele vai deixar como NULL o horario de entrada e o de saída
     --Caso contrário, ele vai calcular o total de segundos que a pessoa ficou na consulta em si, e colocar na tabela de tempo_atendido
     IF hora_aten1_in = '' THEN
@@ -54,14 +59,15 @@ BEGIN
     END IF;
 
 
-    id := usuario_in || '/' || codigo_consulta_in;
-
-
     INSERT INTO fichadeatendimento
     (id, unidadeid, unidade, profissional, especialidade, motivo_consulta, 
     data_consulta, data_nascimento, sexo, horario, tempo_atendido)
     VALUES
-    (id, unidadeid_in, unidade_in, profissional_in, especialidade_in, motivo_consulta_in, 
+    (id_in, unidadeid_in, unidade_in, profissional_in, especialidade_in, motivo_consulta_in, 
     data_consulta_in, data_nascimento_in, sexo_in, horario_in, tempo_atendido);
 END;
 $$ LANGUAGE plpgsql;
+
+SELECT COUNT(*) FROM fichadeatendimento;
+
+DELETE FROM fichadeatendimento;

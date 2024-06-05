@@ -44,12 +44,12 @@ if __name__ == '__main__':
                                 '{row[11]}',
                                 '{row[12]}');"""
                                )
-                connection.commit()
             except (psycopg2.errors.UniqueViolation, psycopg2.errors.InFailedSqlTransaction):
                 print(f"""Ficha com o id {
                       row[6]}/{row[9]} já existe no sistema, skippando""")
                 continue
 
+        connection.commit()
         cursor.close()
         connection.close()
 

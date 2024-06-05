@@ -1,5 +1,8 @@
-CREATE OR REPLACE VIEW fichasgeral
-AS SELECT
+DROP MATERIALIZED VIEW fichasgeral;
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS fichasgeral
+AS 
+SELECT
   id,
   unidade,
   profissional,
@@ -7,13 +10,11 @@ AS SELECT
   data_consulta,
   sexo,
   horario,
-  (hora_aten2 - hora_aten1) AS tempo_atendido
+  tempo_atendido
 FROM fichadeatendimento
 WHERE unidade NOT LIKE '%FISIOTERAPIA%';
 
-
-
-CREATE OR REPLACE VIEW fichasunidades
+CREATE OR REPLACE MATERIALIZED VIEW fichasunidades
 AS SELECT
   id,
   unidade,
@@ -22,7 +23,7 @@ AS SELECT
   sexo,
   data_consulta,
   horario,
-  hora_aten2 - hora_aten1 AS tempo_atendido,
+  tempo_atendido,
   CASE
     WHEN EXTRACT(HOUR FROM horario) IS NULL THEN NULL
     WHEN EXTRACT(HOUR FROM horario) >= 18 THEN 'FORA DE TURNO'
@@ -39,7 +40,7 @@ AND (unidade LIKE 'ESF%' OR unidade LIKE 'UBS%' OR unidade LIKE '%CANGO');
 
 
 
-CREATE OR REPLACE VIEW fichascscn
+CREATE OR REPLACE MATERIALIZED VIEW fichascscn
 AS SELECT
   id,
   unidade,
@@ -47,7 +48,7 @@ AS SELECT
   especialidade,
   data_consulta,
   horario,
-  hora_aten2 - hora_aten1 AS tempo_atendido,
+  tempo_atendido,
   CASE
     WHEN EXTRACT(HOUR FROM horario) IS NULL THEN NULL
     WHEN EXTRACT(HOUR FROM horario) >= 19 AND EXTRACT(HOUR FROM horario) <= 23 THEN 'NOITE'
@@ -62,7 +63,7 @@ WHERE unidadeid = 427;
 
 
 
-CREATE OR REPLACE VIEW fichasfisioterapia
+CREATE OR REPLACE MATERIALIZED VIEW fichasfisioterapia
 AS SELECT
   id,
   unidade, 
@@ -74,7 +75,7 @@ WHERE unidade LIKE '%FISIOTERAPIA%';
 
 
 
-CREATE OR REPLACE VIEW fichasenfermagem 
+CREATE OR REPLACE MATERIALIZED VIEW fichasenfermagem 
 AS SELECT
   id,
   unidade,
@@ -83,7 +84,7 @@ AS SELECT
   sexo,
   data_consulta,
   horario,
-  hora_aten2 - hora_aten1 AS tempo_atendido,
+  tempo_atendido,
   CASE
     WHEN EXTRACT(HOUR FROM horario) IS NULL THEN NULL
     WHEN EXTRACT(HOUR FROM horario) >= 18 THEN 'FORA DE TURNO'

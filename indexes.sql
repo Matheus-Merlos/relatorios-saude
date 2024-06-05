@@ -1,0 +1,1 @@
+CREATE INDEX idx_id_ficha ON fichadeatendimento USING HASH(id);
