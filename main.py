@@ -1,12 +1,12 @@
 from pathlib import Path
-from database import PostgresConnection
+from database import PostgresConnection, DataInserter, Procedures
 import csv
 
 
 if __name__ == '__main__':
     # pega todos os CSV's do diretório atual, e depois pega o último csv
     files = [file for file in Path(__file__).parent.iterdir(
-    ) if file.is_file() and str(file).endswith('.csv')]
+    ) if file.is_file() and str(file).endswith('.csv') and 'ficha' in str(file).lower()]
     latest_csv = max(files, key=lambda file: file.stat().st_mtime)
 
     with PostgresConnection('.env') as connection:
@@ -15,21 +15,12 @@ if __name__ == '__main__':
             file_as_csv = csv.reader(file, delimiter=';')
             [next(file_as_csv) for _ in range(3)]  # pula as 3 primeiras linhas
 
+            inserter = DataInserter(connection)
+
             for row in file_as_csv:
-                connection.execute(f"""CALL insert_ficha(
-                                {row[0]},
-                                '{row[1]}',
-                                '{row[2]}',
-                                '{row[3]}',
-                                '{row[4]}',
-                                '{row[5]}',
-                                {row[6]},
-                                '{row[7]}',
-                                '{row[8][0]}',
-                                {row[9]},
-                                '{row[10]}',
-                                '{row[11]}',
-                                '{row[12]}');"""
+                inserter.insert_with_procedure(
+                    Procedures.INSERT_FICHA,
+                    row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8][0], row[9], row[10], row[11], row[12]
                 )
 
             connection.commit()

@@ -1,6 +1,14 @@
 import psycopg2
 from dotenv import load_dotenv
 from os import getenv
+from enum import Enum
+
+
+class Procedures(Enum):
+    INSERT_FICHA = 'insert_ficha'
+
+    def __str__(self) -> str:
+        return self.value
 
 
 class PostgresConnection:
@@ -44,3 +52,16 @@ class PostgresConnection:
 
     def commit(self) -> None:
         self.__connection.commit()
+
+
+class DataInserter:
+    def __init__(self, connection: PostgresConnection) -> None:
+        self.__connection = connection
+
+    def insert_with_procedure(self, procedure: Procedures, *args) -> None:
+        formatted_args = [
+            f"'{arg}'" if not arg.isdigit() else arg for arg in args]
+        procedure_args = ', '.join(formatted_args)
+
+        query = f"CALL {procedure}({procedure_args})"
+        self.__connection.execute(query)
