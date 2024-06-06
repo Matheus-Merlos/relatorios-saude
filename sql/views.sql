@@ -22,13 +22,7 @@ AS SELECT
   data_consulta,
   horario,
   tempo_atendido,
-  CASE
-    WHEN EXTRACT(HOUR FROM horario) IS NULL THEN NULL
-    WHEN EXTRACT(HOUR FROM horario) >= 18 THEN 'FORA DE TURNO'
-    WHEN EXTRACT(HOUR FROM horario) >= 13 THEN 'TARDE'
-    WHEN EXTRACT(HOUR FROM horario) >= 7 THEN 'MANHÃ'
-    ELSE 'FORA DE TURNO'
-  END AS turno
+  turno
 FROM
   fichadeatendimento
 WHERE (especialidade = 'MEDICO DA ESTRATÉGIA DE SAUDE DA FAMILIA' OR
@@ -45,14 +39,7 @@ AS SELECT
   data_consulta,
   horario,
   tempo_atendido,
-  CASE
-    WHEN EXTRACT(HOUR FROM horario) IS NULL THEN NULL
-    WHEN EXTRACT(HOUR FROM horario) >= 19 AND EXTRACT(HOUR FROM horario) <= 23 THEN 'NOITE'
-    WHEN EXTRACT(HOUR FROM horario) >= 17 THEN 'DUPLO'
-    WHEN EXTRACT(HOUR FROM horario) >= 13 THEN 'TARDE'
-    WHEN EXTRACT(HOUR FROM horario) >= 7 THEN 'MANHÃ'
-    ELSE 'FORA DE TURNO'
-  END AS turno
+  turno
 FROM 
     fichadeatendimento
 WHERE unidadeid = 427;
@@ -81,13 +68,7 @@ AS SELECT
   data_consulta,
   horario,
   tempo_atendido,
-  CASE
-    WHEN EXTRACT(HOUR FROM horario) IS NULL THEN NULL
-    WHEN EXTRACT(HOUR FROM horario) >= 18 THEN 'FORA DE TURNO'
-    WHEN EXTRACT(HOUR FROM horario) >= 13 THEN 'TARDE'
-    WHEN EXTRACT(HOUR FROM horario) >= 7 THEN 'MANHÃ'
-    ELSE 'FORA DE TURNO'
-  END AS turno
+  turno
 FROM
   fichadeatendimento
 WHERE (especialidade = 'ENFERMEIRO DA ESTRATÉGIA DE SAÚDE DA FAMÍLIA'

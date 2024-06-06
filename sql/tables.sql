@@ -9,5 +9,6 @@ CREATE TABLE fichadeatendimento(
   data_nascimento DATE,
   sexo CHAR(1),
   horario TIME,
-  tempo_atendido INTEGER
+  tempo_atendido INTEGER,
+  turno VARCHAR(15)
 );

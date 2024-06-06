@@ -35,6 +35,7 @@ DECLARE
     tempo_atendido INTEGER;
     hora_in TIME;
     hora_out TIME;
+    turno VARCHAR;
 BEGIN
     id_in := usuario_in || '/' || codigo_consulta_in;
     IF EXISTS (SELECT 1 FROM fichadeatendimento AS f WHERE f.id = id_in) THEN
@@ -58,16 +59,24 @@ BEGIN
         END IF;
     END IF;
 
+    turno := CASE
+                 WHEN horario_in IS NULL THEN NULL
+                 WHEN EXTRACT(HOUR FROM horario_in) BETWEEN 19 AND 23 THEN 'NOITE'
+                 WHEN EXTRACT(HOUR FROM horario_in) >= 17 THEN 'DUPLO'
+                 WHEN EXTRACT(HOUR FROM horario_in) >= 13 THEN 'TARDE'
+                 WHEN EXTRACT(HOUR FROM horario_in) >= 7 THEN 'MANHÃ'
+                 ELSE 'FORA DE TURNO'
+             END;
+
 
     INSERT INTO fichadeatendimento
     (id, unidadeid, unidade, profissional, especialidade, motivo_consulta, 
-    data_consulta, data_nascimento, sexo, horario, tempo_atendido)
+    data_consulta, data_nascimento, sexo, horario, tempo_atendido, turno)
     VALUES
     (id_in, unidadeid_in, unidade_in, profissional_in, especialidade_in, motivo_consulta_in, 
-    data_consulta_in, data_nascimento_in, sexo_in, horario_in, tempo_atendido);
+    data_consulta_in, data_nascimento_in, sexo_in, horario_in, tempo_atendido, turno);
 END;
 $$ LANGUAGE plpgsql;
-
 
 CREATE OR REPLACE PROCEDURE refresh_views()
 AS $$
