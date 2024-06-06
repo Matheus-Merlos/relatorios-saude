@@ -1,8 +1,6 @@
-from dotenv import load_dotenv
 from pathlib import Path
-import psycopg2
+from database import PostgresConnection
 import csv
-import os
 
 
 if __name__ == '__main__':
@@ -11,44 +9,31 @@ if __name__ == '__main__':
     ) if file.is_file() and str(file).endswith('.csv')]
     latest_csv = max(files, key=lambda file: file.stat().st_mtime)
 
-    load_dotenv()
+    with PostgresConnection('.env') as connection:
 
-    credentials = {
-        'user': os.getenv('USER'),
-        'password': os.getenv('PASSWORD'),
-        'host': os.getenv('HOST'),
-        'database': os.getenv('DATABASE')
-    }
-    with open(latest_csv, 'r', encoding='utf-8') as file:
-        file_as_csv = csv.reader(file, delimiter=';')
-        [next(file_as_csv) for _ in range(3)]  # pula as 3 primeiras linhas
+        with open(latest_csv, 'r', encoding='utf-8') as file:
+            file_as_csv = csv.reader(file, delimiter=';')
+            [next(file_as_csv) for _ in range(3)]  # pula as 3 primeiras linhas
 
-        connection = psycopg2.connect(**credentials)
-        cursor = connection.cursor()
+            for row in file_as_csv:
+                connection.execute(f"""CALL insert_ficha(
+                                {row[0]},
+                                '{row[1]}',
+                                '{row[2]}',
+                                '{row[3]}',
+                                '{row[4]}',
+                                '{row[5]}',
+                                {row[6]},
+                                '{row[7]}',
+                                '{row[8][0]}',
+                                {row[9]},
+                                '{row[10]}',
+                                '{row[11]}',
+                                '{row[12]}');"""
+                )
 
-        for row in file_as_csv:
-            cursor.execute(f"""CALL insert_ficha(
-                            {row[0]},
-                            '{row[1]}',
-                            '{row[2]}',
-                            '{row[3]}',
-                            '{row[4]}',
-                            '{row[5]}',
-                            {row[6]},
-                            '{row[7]}',
-                            '{row[8][0]}',
-                            {row[9]},
-                            '{row[10]}',
-                            '{row[11]}',
-                            '{row[12]}');"""
-                           )
+            connection.commit()
 
-        connection.commit()
-
-        cursor.execute("CALL refresh_views()")
-
-        connection.commit()
-        cursor.close()
-        connection.close()
+            connection.execute('CALL refresh_views()')
 
     print('Importação de dados concluída com sucesso!')

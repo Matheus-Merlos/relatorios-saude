@@ -88,3 +88,7 @@ BEGIN
     REFRESH MATERIALIZED VIEW fichasenfermagem;
 END;
 $$ LANGUAGE plpgsql;
+
+SELECT COUNT(*) FROM fichadeatendimento;
+
+DELETE FROM fichadeatendimento;
