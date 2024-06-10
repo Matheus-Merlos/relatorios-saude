@@ -1,14 +1,22 @@
 from pathlib import Path
 from database import PostgresConnection, DataInserter, Procedures
+import logging
 import csv
 
+logger = logging.getLogger(__name__)
 
 if __name__ == '__main__':
     # pega todos os CSV's do diretório atual, e depois pega o último csv
+    logging.basicConfig(level=logging.INFO)
+    
+    logger.info('Searching latest .csv...')
     files = [file for file in Path(__file__).parent.iterdir(
     ) if file.is_file() and str(file).endswith('.csv') and 'ficha' in str(file).lower()]
     latest_csv = max(files, key=lambda file: file.stat().st_mtime)
+    
+    logger.info(f'Latest CSV found: {latest_csv.name}')
 
+    logger.info('Connecting to database...')
     with PostgresConnection('.env') as connection:
 
         with open(latest_csv, 'r', encoding='utf-8') as file:
@@ -27,4 +35,4 @@ if __name__ == '__main__':
 
             connection.execute('CALL refresh_views()')
 
-    print('Importação de dados concluída com sucesso!')
+    logger.info('Data import finished with sucess!')
