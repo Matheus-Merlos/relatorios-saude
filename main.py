@@ -5,7 +5,7 @@ import csv
 
 logger = logging.getLogger(__name__)
 
-CURRENT_PATH = Path(__file__).parent
+ROOT = Path(__file__).parent
 
 logging.basicConfig(level=logging.INFO)
 
@@ -13,7 +13,7 @@ def main() -> None:
     # pega todos os CSV's do diretório atual, e depois pega o último csv
     logger.info('Searching latest .csv...')
 
-    files = [file for file in CURRENT_PATH.iterdir() if str(file).endswith('.csv') and 'ficha' in str(file).lower()]
+    files = [file for file in ROOT.iterdir() if str(file).endswith('.csv') and 'ficha' in str(file).lower()]
     
     latest_csv = max(files, key=lambda file: file.stat().st_mtime)
     
@@ -32,7 +32,7 @@ def main() -> None:
             for row in file_as_csv:
                 inserter.insert_with_procedure(
                     Procedures.INSERT_FICHA,
-                    row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8][0], row[9], row[10], row[11], row[12]
+                    row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12]
                 )
 
             connection.commit()

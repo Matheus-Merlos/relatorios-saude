@@ -14,6 +14,22 @@ END;
 $$ LANGUAGE plpgsql;
 
 
+CREATE OR REPLACE FUNCTION format_sexo(sexo_in VARCHAR)
+RETURNS CHAR AS $$
+DECLARE
+    sexo CHAR;
+BEGIN
+    SEXO := CASE sexo_in
+                WHEN 'FEMININO' THEN 'F'
+                WHEN 'MASCULINO' THEN 'M'
+                ELSE sexo_in
+            END;
+    
+    RETURN SEXO;
+END;
+$$ LANGUAGE plpgsql;
+
+
 CREATE OR REPLACE PROCEDURE insert_ficha(
     unidadeid_in INTEGER,
     unidade_in VARCHAR, 
@@ -23,7 +39,7 @@ CREATE OR REPLACE PROCEDURE insert_ficha(
     data_consulta_in DATE,
     usuario_in INTEGER,
     data_nascimento_in DATE, 
-    sexo_in CHAR,
+    sexo_in VARCHAR,
     codigo_consulta_in INTEGER,
     horario_in TIME, 
     hora_aten1_in VARCHAR, 
@@ -36,6 +52,7 @@ DECLARE
     hora_in TIME;
     hora_out TIME;
     turno VARCHAR;
+    sexo CHAR;
 BEGIN
     id_in := usuario_in || '/' || codigo_consulta_in;
     IF EXISTS (SELECT 1 FROM fichadeatendimento AS f WHERE f.id = id_in) THEN
@@ -68,13 +85,14 @@ BEGIN
                  ELSE 'FORA DE TURNO'
              END;
 
+    sexo := format_sexo(sexo_in);
 
     INSERT INTO fichadeatendimento
     (id, unidadeid, unidade, profissional, especialidade, motivo_consulta, 
     data_consulta, data_nascimento, sexo, horario, tempo_atendido, turno)
     VALUES
     (id_in, unidadeid_in, unidade_in, profissional_in, especialidade_in, motivo_consulta_in, 
-    data_consulta_in, data_nascimento_in, sexo_in, horario_in, tempo_atendido, turno);
+    data_consulta_in, data_nascimento_in, sexo, horario_in, tempo_atendido, turno);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -88,7 +106,3 @@ BEGIN
     REFRESH MATERIALIZED VIEW fichasenfermagem;
 END;
 $$ LANGUAGE plpgsql;
-
-SELECT COUNT(*) FROM fichadeatendimento;
-
-DELETE FROM fichadeatendimento;
