@@ -106,3 +106,6 @@ BEGIN
     REFRESH MATERIALIZED VIEW fichasenfermagem;
 END;
 $$ LANGUAGE plpgsql;
+
+SELECT * FROM fichadeatendimento;
+DELETE FROM fichadeatendimento;
