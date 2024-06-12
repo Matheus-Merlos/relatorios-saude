@@ -42,7 +42,7 @@ class PostgresConnection:
         self.__cursor.close()
         self.__connection.close()
 
-        if class_exception is not None:
+        if class_exception:
             raise class_exception(*exception_.args).with_traceback(traceback_)
 
         return True

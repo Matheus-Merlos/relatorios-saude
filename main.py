@@ -2,11 +2,9 @@ from pathlib import Path
 from database import Procedures
 from insert import import_data
 
-ROOT = Path(__file__).parent
-
 
 def main() -> None:
-    import_data('ficha', Procedures.INSERT_FICHA, '.env')
+    import_data('ficha', Procedures.INSERT_FICHA)
 
 
 if __name__ == '__main__':
